@@ -90,8 +90,21 @@ OUTER_ARRAY *make_2D_array(int width, int height){
 
 }
 
-void free_2D_array(OUTER_ARRAY grid, int width, int height){
+void free_2D_array(OUTER_ARRAY *grid, int width, int height){
+  
+  for(int i = 0; i < width; i++){
+    for(int j = 0; j < height; j++){
+      
+      free(grid->i_array->cell);
 
+      INNER_ARRAY *tmp = grid->i_array->next;
+      grid->i_array = tmp;
+
+    }
+    free(grid->i_array);
+    grid = grid->next;
+
+  }
 }
 
 char state_to_ascii(int state){
@@ -174,7 +187,6 @@ void update(OUTER_ARRAY *grid, OUTER_ARRAY *grid_old, int width, int height){
       else {
         put_array_cell(grid, x, y, get_array_cell(grid_old, x, y, width, height)->state, width, height); 
       }
-
       
     }
   }
@@ -188,6 +200,7 @@ int main(){
   int width = 50;
   int height = 50;
   int running = 1;
+  int starting_time = clock();
 
   OUTER_ARRAY *grid = make_2D_array(width, height);
   OUTER_ARRAY *grid_old = make_2D_array(width, height);
@@ -210,5 +223,11 @@ int main(){
     while (time < time_e) {
       time = clock();
     }
+    if(clock()-starting_time > 1000000){
+      running = 0;
+    }
   }
+
+  free_2D_array(grid, width, height);
+  free_2D_array(grid_old, width, height);
 }
